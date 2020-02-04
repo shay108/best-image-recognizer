@@ -1,3 +1,6 @@
+# virtualenv
+venv/
+
 # IDE
 .DS_Store
-.idea
+.idea/
