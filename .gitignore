@@ -1,6 +1,6 @@
 # virtualenv
-venv/
+/venv/
 
 # IDE
-.DS_Store
-.idea/
+/.DS_Store/
+/.idea/
