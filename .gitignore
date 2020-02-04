@@ -4,3 +4,6 @@
 # IDE
 /.DS_Store/
 /.idea/
+
+# Python
+__pycachce__/
