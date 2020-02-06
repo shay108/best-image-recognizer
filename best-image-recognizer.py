@@ -1,3 +1,9 @@
+# Endpoint: https://westcentralus.api.cognitive.microsoft.com/face/v1.0
+# Key 1: e624d4fc0fb2423c890e37001e6709b7
+# Key 2: e65f3e6ee83b46bb8328e4a204fba396
+
+# https://i.ibb.co/tpXQ1tH/Shay-Profile-Pic.jpg
+
 from flask import Flask
 import json
 import requests
