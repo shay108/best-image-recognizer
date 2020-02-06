@@ -1,5 +1,6 @@
 from flask import Flask
 import json
+import requests
 
 app = Flask(__name__)
 
@@ -9,10 +10,25 @@ def hello_world():
     return 'Hello, World!'
 
 
-@app.route("/api", methods=['POST', 'GET'])
+@app.route("/api", methods=['POST'])
 def api():
-    return {"result": "success"}
+    # Parse input
+    image_list = payload[0]
+    enriched_image_list = get_parsed_http_input(payload)
 
+    # Group the face images into groups
+    facegroup_list = get_grouped_faces(image_list)
+
+    # Assuming the groups list is sorted according to size
+    most_common_facegroup = facegroup_list[0]
+
+    # Find best image in the most common facegroup
+    best_image = get_best_image(most_common_facegroup)
+
+    # Get the best image's metadata
+    best_image_metadata = get_image_metadata(best_image, enriched_image_list)
+
+    return best_image_metadata
 
 
 
