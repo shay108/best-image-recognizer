@@ -1,5 +1,6 @@
-from flask import Flask
+from flask import Flask, request
 import requests
+app = Flask(__name__)
 
 IMAGES_FOLDER = "./image_files"
 AZURE_ENDPOINT = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0"
@@ -13,7 +14,7 @@ MOCK_JSON_INPUT = {
         "barack3.jpg",
         "donald1.jpg",
         "donald2.jpg",
-        "hillary1.jpg",
+        "hillary1.jpg"
     ]
 }
 
@@ -29,6 +30,19 @@ def get_face_metadata(image_name: str) -> dict:
     response = requests.post(azure_face_detect_api, headers=headers, data=image_data)
 
     return response.json()[0]
+
+
+def analyze_images(images_list: list) -> dict:
+    images_dict = dict()
+
+    for image in images_list:
+        image_metadata = get_face_metadata(image)
+        new_faceId = image_metadata["faceId"]
+        image_metadata["image_name"] = image
+
+        images_dict[new_faceId] = image_metadata
+
+    return images_dict
 
 
 def get_grouped_faces(images_json: dict) -> dict:
@@ -64,25 +78,10 @@ def get_best_image(facegroup: list, analyzed_images: list) -> dict:
     return best_image
 
 
-app = Flask(__name__)
-
-# @app.route("/api", methods=['POST'])
-# def api(images_list=MOCK_JSON_INPUT):
-
-
 def main(payload) -> dict:
-    analyzed_images = dict()
-    faceIds_json = {"faceIds": []}
-
     images_list = payload["images"]
-    for image in images_list:
-        image_metadata = get_face_metadata(image)
-        new_faceId = image_metadata["faceId"]
-        image_metadata["image_name"] = image
-
-        analyzed_images[new_faceId] = image_metadata
-
-    faceIds_json["faceIds"] = list(analyzed_images.keys())
+    enhanced_images = analyze_images(images_list)
+    faceIds_json = {"faceIds": list(enhanced_images.keys())}
 
     # Group the face images into groups
     facegroups = get_grouped_faces(faceIds_json)
@@ -91,13 +90,16 @@ def main(payload) -> dict:
     most_common_facegroup = facegroups["groups"][0]
 
     # Find best image in the most common facegroup
-    best_image = get_best_image(most_common_facegroup, analyzed_images)
+    best_image = get_best_image(most_common_facegroup, enhanced_images)
 
     return best_image
 
 
-print(main(MOCK_JSON_INPUT))
+@app.route("/api", methods=['POST'])
+def api():
+    payload = request.get_json()
+    return main(payload)
 
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
