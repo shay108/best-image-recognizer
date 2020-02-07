@@ -5,7 +5,7 @@ app = Flask(__name__)
 IMAGES_FOLDER = "./image_files"
 AZURE_ENDPOINT = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0"
 AZURE_API_KEY = "e624d4fc0fb2423c890e37001e6709b7"
-AZURE_API_KEY2 = "e65f3e6ee83b46bb8328e4a204fba396"
+# AZURE_API_KEY2 = "e65f3e6ee83b46bb8328e4a204fba396"
 
 MOCK_JSON_INPUT = {
     "images": [
@@ -38,7 +38,7 @@ def analyze_images(images_list: list) -> dict:
     for image in images_list:
         image_metadata = get_face_metadata(image)
         new_faceId = image_metadata["faceId"]
-        image_metadata["image_name"] = image
+        image_metadata["imageName"] = image
 
         images_dict[new_faceId] = image_metadata
 
@@ -55,7 +55,7 @@ def get_grouped_faces(images_json: dict) -> dict:
     return grouped_images
 
 
-def get_most_common_facegroup(facegroups: list) -> list:
+def get_largest_facegroup(facegroups: list) -> list:
     if len(facegroups["groups"]) > 0:
         return max(facegroups["groups"], key=len)
     else:
@@ -71,7 +71,7 @@ def get_best_image(facegroup: list, analyzed_images: list) -> dict:
         face_meta = analyzed_images[faceId]
         face_rect = face_meta["faceRectangle"]
         face_area = face_rect["width"] * face_rect["height"]
-        image_path = IMAGES_FOLDER + "/" + face_meta["image_name"]
+        image_path = IMAGES_FOLDER + "/" + face_meta["imageName"]
 
         im = Image.open(image_path)
         tot_width, tot_height = im.size
@@ -82,26 +82,32 @@ def get_best_image(facegroup: list, analyzed_images: list) -> dict:
             best_ratio = face_ratio
             best_image = analyzed_images[faceId]
 
+    best_image["faceRatio"] = round(best_ratio, 2)
     return best_image
 
 
 def main(payload) -> dict:
+    # Validate payload structure
+    if ("images" not in payload) or (type(payload["images"]) != list):
+        return "ERROR: Payload is malformed"
+
+    # Validate payload length
     images_list = payload["images"]
     if len(images_list) < 2:
-        return "Error: A minimum of 2 images must be provided"
+        return "ERROR: A minimum of 2 images must be provided"
 
     # Detect faces and get images metadata
-    enhanced_images = analyze_images(images_list)
-    faceIds_json = {"faceIds": list(enhanced_images.keys())}
+    images_metadata = analyze_images(images_list)
+    faceIds_json = {"faceIds": list(images_metadata.keys())}  # faceIds are needed for grouping
 
-    # Group the face images into groups
+    # Group the face images
     facegroups = get_grouped_faces(faceIds_json)
 
-    # Find the most common facegroup
-    most_common_facegroup = get_most_common_facegroup(facegroups)
+    # Find the most common face (i.e. largest facegroup)
+    largest_facegroup = get_largest_facegroup(facegroups)
 
-    # Find best image in the most common facegroup
-    best_image = get_best_image(most_common_facegroup, enhanced_images)
+    # Find best image in the most common face
+    best_image = get_best_image(largest_facegroup, images_metadata)
 
     return best_image
 
