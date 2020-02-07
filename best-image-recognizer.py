@@ -87,7 +87,7 @@ def get_best_image(facegroup: list, analyzed_images: list) -> dict:
 
 
 def main(payload) -> dict:
-    # Validate payload structure
+    # Validate payload fields
     if ("images" not in payload) or (type(payload["images"]) != list):
         return "ERROR: Payload is malformed"
 
