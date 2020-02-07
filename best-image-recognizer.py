@@ -1,10 +1,11 @@
-from flask import Flask
+from flask import Flask, request
 import requests
+app = Flask(__name__)
 
 IMAGES_FOLDER = "./image_files"
 AZURE_ENDPOINT = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0"
 AZURE_API_KEY = "e624d4fc0fb2423c890e37001e6709b7"
-AZURE_API_KEY2 = "e65f3e6ee83b46bb8328e4a204fba396"
+# AZURE_API_KEY2 = "e65f3e6ee83b46bb8328e4a204fba396"
 
 MOCK_JSON_INPUT = {
     "images": [
@@ -13,7 +14,7 @@ MOCK_JSON_INPUT = {
         "barack3.jpg",
         "donald1.jpg",
         "donald2.jpg",
-        "hillary1.jpg",
+        "hillary1.jpg"
     ]
 }
 
@@ -31,6 +32,19 @@ def get_face_metadata(image_name: str) -> dict:
     return response.json()[0]
 
 
+def analyze_images(images_list: list) -> dict:
+    images_dict = dict()
+
+    for image in images_list:
+        image_metadata = get_face_metadata(image)
+        new_faceId = image_metadata["faceId"]
+        image_metadata["imageName"] = image
+
+        images_dict[new_faceId] = image_metadata
+
+    return images_dict
+
+
 def get_grouped_faces(images_json: dict) -> dict:
     azure_face_group_api = AZURE_ENDPOINT + "/group"
 
@@ -39,6 +53,13 @@ def get_grouped_faces(images_json: dict) -> dict:
     grouped_images = response.json()
 
     return grouped_images
+
+
+def get_largest_facegroup(facegroups: list) -> list:
+    if len(facegroups["groups"]) > 0:
+        return max(facegroups["groups"], key=len)
+    else:
+        return facegroups["messyGroup"]
 
 
 def get_best_image(facegroup: list, analyzed_images: list) -> dict:
@@ -50,7 +71,7 @@ def get_best_image(facegroup: list, analyzed_images: list) -> dict:
         face_meta = analyzed_images[faceId]
         face_rect = face_meta["faceRectangle"]
         face_area = face_rect["width"] * face_rect["height"]
-        image_path = IMAGES_FOLDER + "/" + face_meta["image_name"]
+        image_path = IMAGES_FOLDER + "/" + face_meta["imageName"]
 
         im = Image.open(image_path)
         tot_width, tot_height = im.size
@@ -61,43 +82,41 @@ def get_best_image(facegroup: list, analyzed_images: list) -> dict:
             best_ratio = face_ratio
             best_image = analyzed_images[faceId]
 
+    best_image["faceRatio"] = round(best_ratio, 2)
     return best_image
-
-
-app = Flask(__name__)
-
-# @app.route("/api", methods=['POST'])
-# def api(images_list=MOCK_JSON_INPUT):
 
 
 def main(payload) -> dict:
-    analyzed_images = dict()
-    faceIds_json = {"faceIds": []}
+    # Validate payload structure
+    if ("images" not in payload) or (type(payload["images"]) != list):
+        return "ERROR: Payload is malformed"
 
+    # Validate payload length
     images_list = payload["images"]
-    for image in images_list:
-        image_metadata = get_face_metadata(image)
-        new_faceId = image_metadata["faceId"]
-        image_metadata["image_name"] = image
+    if len(images_list) < 2:
+        return "ERROR: A minimum of 2 images must be provided"
 
-        analyzed_images[new_faceId] = image_metadata
+    # Detect faces and get images metadata
+    images_metadata = analyze_images(images_list)
+    faceIds_json = {"faceIds": list(images_metadata.keys())}  # faceIds are needed for grouping
 
-    faceIds_json["faceIds"] = list(analyzed_images.keys())
-
-    # Group the face images into groups
+    # Group the face images
     facegroups = get_grouped_faces(faceIds_json)
 
-    # Assuming the groups list is sorted according to size
-    most_common_facegroup = facegroups["groups"][0]
+    # Find the most common face (i.e. largest facegroup)
+    largest_facegroup = get_largest_facegroup(facegroups)
 
-    # Find best image in the most common facegroup
-    best_image = get_best_image(most_common_facegroup, analyzed_images)
+    # Find best image in the most common face
+    best_image = get_best_image(largest_facegroup, images_metadata)
 
     return best_image
 
 
-print(main(MOCK_JSON_INPUT))
+@app.route("/api", methods=['POST'])
+def api():
+    payload = request.get_json()
+    return main(payload)
 
 
-# if __name__ == '__main__':
-#     app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True)
