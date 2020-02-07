@@ -55,6 +55,13 @@ def get_grouped_faces(images_json: dict) -> dict:
     return grouped_images
 
 
+def get_most_common_facegroup(facegroups: list) -> list:
+    if len(facegroups["groups"]) > 0:
+        return max(facegroups["groups"], key=len)
+    else:
+        return facegroups["messyGroup"]
+
+
 def get_best_image(facegroup: list, analyzed_images: list) -> dict:
     from PIL import Image
 
@@ -80,14 +87,18 @@ def get_best_image(facegroup: list, analyzed_images: list) -> dict:
 
 def main(payload) -> dict:
     images_list = payload["images"]
+    if len(images_list) < 2:
+        return "Error: A minimum of 2 images must be provided"
+
+    # Detect faces and get images metadata
     enhanced_images = analyze_images(images_list)
     faceIds_json = {"faceIds": list(enhanced_images.keys())}
 
     # Group the face images into groups
     facegroups = get_grouped_faces(faceIds_json)
 
-    # Assuming the groups list is sorted according to size
-    most_common_facegroup = facegroups["groups"][0]
+    # Find the most common facegroup
+    most_common_facegroup = get_most_common_facegroup(facegroups)
 
     # Find best image in the most common facegroup
     best_image = get_best_image(most_common_facegroup, enhanced_images)
