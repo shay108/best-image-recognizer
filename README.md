@@ -9,13 +9,16 @@ The service utilizes the **Azure Face API** ([more info here](https://azure.micr
 ## Input
 The service gets a `JSON over http`, containing a *list of images* (*image* means a local filename).
 The list of images references filenames located in the "local storage" of the webserver (namely the `image_files` folder).
-Example json below.
+
+Example json, below.
 
 ## Output
 The http request returns a `JSON over http` as well. The JSON contains:
 1. Face metadata (from the Azure API) of the "best image"
 2. Filename of the "best image"
-3. Face ratio of the "best image"
+3. Face ratio of the "best image".
+
+Example json, below.
 
 ## Installation
 1. Download the files to a folder or clone the repo
