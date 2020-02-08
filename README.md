@@ -28,6 +28,7 @@ The http request returns a `JSON over http` as well. The JSON contains:
 
 ## Usage
 After starting the webserver, use any kind of web client (e.g. *Postman*) to make a post request to the exposed API: `localhost:5000/best_image`
+
 **IMPORTANT:** the application uses my own `AZURE_ENDPOINT` and `AZURE_API_KEY` (which is valid until **2020-02-12**). After these dates - new key and endpoint need to be generated from Microsoft ([here](https://azure.microsoft.com/en-in/try/cognitive-services/)).
 The new endpoint and key need to be updated in *consts* section at the `helpers.py` file.  
  
