@@ -24,7 +24,7 @@ Example json, below.
 1. Download the files to a folder or clone the repo
 2. In the root folder, create a virtualenv: `virtualenv -p python3.7 venv`
 3. Activate the virtualenv: `. /venv/bin/activate`
-4. Install the requirements: `pip install -r requirements`
+4. Install the requirements: `pip install -r requirements.txt`
 5. Set the `FLASK_APP` environment variable: `export FLASK_APP=flask_handler.py`
 * For *debug* mode, also set the following variable: `export FLASK_DEBUG=1`  
 6. Start the webserver: `python -m flask run`
