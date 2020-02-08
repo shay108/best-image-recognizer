@@ -27,7 +27,7 @@ Example json, below.
 4. Install the requirements: `pip install -r requirements.txt`
 5. Set the `FLASK_APP` environment variable: `export FLASK_APP=flask_handler.py`
 * For *debug* mode, also set the following variable: `export FLASK_DEBUG=1`  
-6. Start the webserver: `python -m flask run`
+6. Start the webserver: `python flask_handler.py`
 
 ## Usage
 After starting the webserver, use any kind of web client (e.g. *Postman*) to make a post request to the exposed API: `localhost:5000/best_image`
@@ -86,6 +86,7 @@ The software supports handling of the following errors/exceptions:
 * As mentioned above, the *example json*  contains some entries which demonstrate handling some of the above errors 
 
 ## Potential Improvements
-1. Error propagation is done in a very basic way, and can be improved
-2. Adding automated tests
-3. Adding type checking (e.g. using `mypy`)
+1. Adding parallelization for the face detection process
+2. Error propagation is done in a very basic way, and can be improved
+3. Adding automated tests
+4. Adding type checking (e.g. using `mypy`)
