@@ -1,22 +1,9 @@
-from flask import Flask, request
 import requests
-app = Flask(__name__)
 
 IMAGES_FOLDER = "./image_files"
 AZURE_ENDPOINT = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0"
 AZURE_API_KEY = "e624d4fc0fb2423c890e37001e6709b7"
 # AZURE_API_KEY2 = "e65f3e6ee83b46bb8328e4a204fba396"
-
-MOCK_JSON_INPUT = {
-    "images": [
-        "barack1.jpg",
-        "barack2.jpg",
-        "barack3.jpg",
-        "donald1.jpg",
-        "donald2.jpg",
-        "hillary1.jpg"
-    ]
-}
 
 
 def get_face_metadata(image_name: str) -> dict:
@@ -84,39 +71,3 @@ def get_best_image(facegroup: list, analyzed_images: list) -> dict:
 
     best_image["faceRatio"] = round(best_ratio, 2)
     return best_image
-
-
-def main(payload) -> dict:
-    # Validate payload fields
-    if ("images" not in payload) or (type(payload["images"]) != list):
-        return "ERROR: Payload is malformed"
-
-    # Validate payload length
-    images_list = payload["images"]
-    if len(images_list) < 2:
-        return "ERROR: A minimum of 2 images must be provided"
-
-    # Detect faces and get images metadata
-    images_metadata = analyze_images(images_list)
-    faceIds_json = {"faceIds": list(images_metadata.keys())}  # faceIds are needed for grouping
-
-    # Group the face images
-    facegroups = get_grouped_faces(faceIds_json)
-
-    # Find the most common face (i.e. largest facegroup)
-    largest_facegroup = get_largest_facegroup(facegroups)
-
-    # Find best image in the most common face
-    best_image = get_best_image(largest_facegroup, images_metadata)
-
-    return best_image
-
-
-@app.route("/api", methods=['POST'])
-def api():
-    payload = request.get_json()
-    return main(payload)
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
