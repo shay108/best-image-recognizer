@@ -28,7 +28,7 @@ Example json, below.
 5. **IMPORTANT:** Get a free `API key` and `endpoint` from Microsoft ([here](https://azure.microsoft.com/en-in/try/cognitive-services/)).
 The new endpoint and key need to be updated in *consts* section at the `helpers.py` file.  
 6. Start the webserver: `python flask_handler.py`
-* Debug mode is `on` by default
+* Debug mode is **on** by default, for ease of use
 
 ## Usage
 After starting the webserver, use any kind of web client (e.g. *Postman*) to make a post request to the exposed API: `localhost:5000/best_image`
