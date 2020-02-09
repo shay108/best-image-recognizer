@@ -1,4 +1,5 @@
 import requests
+from PIL import Image
 
 # Some consts have an expiration date.
 # To get valid "endpoint" and "key", go to:
@@ -89,8 +90,6 @@ def get_largest_facegroup(facegroups: list) -> list:
 
 def get_best_image(facegroup: list, analyzed_images: list) -> dict:
     """ Returns the best image from a given facegroup list """
-
-    from PIL import Image
 
     best_ratio = 0
     best_image = None
