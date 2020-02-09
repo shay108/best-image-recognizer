@@ -25,14 +25,13 @@ Example json, below.
 2. In the root folder, create a virtualenv: `virtualenv -p python3.7 venv`
 3. Activate the virtualenv: `. /venv/bin/activate`
 4. Install the requirements: `pip install -r requirements.txt`
-5. Start the webserver: `python flask_handler.py`
+5. **IMPORTANT:** Get a free `API key` and `endpoint` from Microsoft ([here](https://azure.microsoft.com/en-in/try/cognitive-services/)).
+The new endpoint and key need to be updated in *consts* section at the `helpers.py` file.  
+6. Start the webserver: `python flask_handler.py`
 * Debug mode is `on` by default
 
 ## Usage
 After starting the webserver, use any kind of web client (e.g. *Postman*) to make a post request to the exposed API: `localhost:5000/best_image`
-
-**IMPORTANT:** the application currently uses a free-tier `AZURE_ENDPOINT` and `AZURE_API_KEY` (which are valid until **2020-02-12**). After these dates - new key and endpoint need to be generated from Microsoft ([here](https://azure.microsoft.com/en-in/try/cognitive-services/)).
-The new endpoint and key need to be updated in *consts* section at the `helpers.py` file.  
  
 ### JSON payload example
 <pre><code>{

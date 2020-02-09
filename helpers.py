@@ -1,13 +1,11 @@
 import requests
 from PIL import Image
 
-# Some consts have an expiration date.
-# To get valid "endpoint" and "key", go to:
+# To get valid AZURE_API_KEY key, go to:
 # https://azure.microsoft.com/en-in/try/cognitive-services/
 IMAGES_FOLDER = "./image_files"
 AZURE_ENDPOINT = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0"
-AZURE_API_KEY = "e624d4fc0fb2423c890e37001e6709b7"
-# AZURE_API_KEY2 = "e65f3e6ee83b46bb8328e4a204fba396"
+AZURE_API_KEY = "REPLACE_ME_WITH_A_KEY"
 
 
 def get_face_metadata(image_name: str) -> dict:
