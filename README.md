@@ -25,9 +25,8 @@ Example json, below.
 2. In the root folder, create a virtualenv: `virtualenv -p python3.7 venv`
 3. Activate the virtualenv: `. /venv/bin/activate`
 4. Install the requirements: `pip install -r requirements.txt`
-5. Set the `FLASK_APP` environment variable: `export FLASK_APP=flask_handler.py`
-* For *debug* mode, also set the following variable: `export FLASK_DEBUG=1`  
-6. Start the webserver: `python flask_handler.py`
+5. Start the webserver: `python flask_handler.py`
+* Debug mode is `on` by default
 
 ## Usage
 After starting the webserver, use any kind of web client (e.g. *Postman*) to make a post request to the exposed API: `localhost:5000/best_image`
